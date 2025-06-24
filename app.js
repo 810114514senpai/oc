@@ -18,20 +18,32 @@ document.getElementById("fetchBtn").addEventListener("click", async () => {
         const text = await resp.text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(text, "text/html");
-        const title = doc.querySelector("meta[property='og:title']") ? doc.querySelector("meta[property='og:title']").content : doc.title || "";
-        const image = doc.querySelector("meta[property='og:image']") ? doc.querySelector("meta[property='og:image']").content : "";
+        const titleMeta = doc.querySelector("meta[property='og:title']");
+        const title = titleMeta ? titleMeta.content : doc.title || "";
+        const imageMeta = doc.querySelector("meta[property='og:image']");
+        const image = imageMeta ? imageMeta.content : "";
         let members = "";
-        const memberElem = doc.querySelector("meta[property='og:description']");
-        if (memberElem && memberElem.content) {
-            const m = memberElem.content.match(/[0-9,]+人/);
+        const descMeta = doc.querySelector("meta[property='og:description']");
+        if (descMeta && descMeta.content) {
+            const m = descMeta.content.match(/[0-9,]+人/);
             members = m ? m[0] : "";
         }
-        resultDiv.innerHTML = `
-            <img class="avatar" src="${image}" alt="アイコン"><br>
-            名前：${title}<br>
-            参加人数：${members}<br>
-            URL：<a href="${url}" target="_blank">OpenChatリンク</a>
-        `;
+        // 該当ページの生テキスト
+        const bodyText = doc.body.innerText;
+        let authInfo = "";
+        if (bodyText.match(/(承認制|認証制|運営承認|管理者による承認|非公開|公開)/)) {
+            const reg = /(承認制|認証制|運営承認|管理者による承認|非公開|公開)/g;
+            const found = bodyText.match(reg);
+            authInfo = "公開状態など: " + ([...new Set(found)].join("・"));
+        } else {
+            authInfo = "公開・認証状態に関する表記なし";
+        }
+        resultDiv.innerHTML = 
+            (image ? `<img class="avatar" src="${image}" alt="アイコン"><br>` : "") +
+            `タイトル：${title}<br>` +
+            `参加人数：${members}<br>` +
+            `${authInfo}<br>` +
+            `URL：<a href="${url}" target="_blank">OpenChatリンク</a>`;
     } catch (e) {
         resultDiv.innerHTML = "エラーが発生しました。";
     }
