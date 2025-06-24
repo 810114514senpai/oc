@@ -1,0 +1,23 @@
+body {
+    font-family: sans-serif;
+    background: #f3f9fc;
+    padding: 30px;
+}
+input, button {
+    padding: 8px;
+    font-size: 16px;
+}
+#result {
+    margin-top: 24px;
+    background: #fff;
+    padding: 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px #0002;
+}
+img.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    display: block;
+}
